@@ -6,7 +6,6 @@
 <title>Engineering Scientific Calculator</title>
 
 <style>
-
 *{
 box-sizing:border-box;
 font-family:Segoe UI, Arial;
@@ -37,7 +36,7 @@ background:white;
 padding:20px;
 border-radius:12px;
 box-shadow:0 6px 20px rgba(0,0,0,0.15);
-width:430px;
+width:450px;
 transition:0.3s;
 }
 
@@ -70,9 +69,7 @@ font-size:15px;
 cursor:pointer;
 }
 
-button:hover{
-opacity:0.9;
-}
+button:hover{opacity:0.9;}
 
 .number{background:#c7d7ea;}
 .operator{background:#f3c88d;}
@@ -83,16 +80,14 @@ opacity:0.9;
 .special{background:#9bd3d0;}
 
 .history{
-width:230px;
+width:250px;
 background:white;
 padding:15px;
 border-radius:12px;
 box-shadow:0 6px 20px rgba(0,0,0,0.15);
 }
 
-.dark .history{
-background:#2b2b2b;
-}
+.dark .history{background:#2b2b2b;}
 
 #historyList{
 height:360px;
@@ -100,7 +95,6 @@ overflow-y:auto;
 font-size:14px;
 margin-bottom:10px;
 }
-
 </style>
 
 </head>
@@ -115,9 +109,9 @@ margin-bottom:10px;
 
 <div class="buttons">
 
-<button class="function" onclick="append('sin(')">sin</button> <button class="function" onclick="append('cos(')">cos</button> <button class="function" onclick="append('tan(')">tan</button> <button class="function" onclick="append('log(')">log</button> <button class="function" onclick="append('ln(')">ln</button> <button class="special" onclick="toggleTheme()">Theme</button>
+<button class="function" onclick="append('sin')">sin</button> <button class="function" onclick="append('cos')">cos</button> <button class="function" onclick="append('tan')">tan</button> <button class="function" onclick="append('log(')">log</button> <button class="function" onclick="append('ln(')">ln</button> <button class="special" onclick="toggleTheme()">Theme</button>
 
-<button class="function" onclick="append('sqrt(')">√</button> <button class="function" onclick="append('^2')">x²</button> <button class="function" onclick="append('^3')">x³</button> <button class="function" onclick="append('^')">xʸ</button> <button class="function" onclick="append('10^')">10ˣ</button> <button class="function" onclick="append('π')">π</button>
+<button class="function" onclick="append('√')">√</button> <button class="function" onclick="append('^2')">x²</button> <button class="function" onclick="append('^3')">x³</button> <button class="function" onclick="append('^')">xʸ</button> <button class="function" onclick="append('10^')">10ˣ</button> <button class="function" onclick="append('π')">π</button>
 
 <button class="function" onclick="append('e')">e</button> <button class="function" onclick="append('rand()')">rand</button> <button class="memory" onclick="memoryAdd()">M+</button> <button class="memory" onclick="memorySub()">M-</button> <button class="memory" onclick="memoryRecall()">MR</button> <button class="memory" onclick="memoryClear()">MC</button>
 
@@ -129,20 +123,16 @@ margin-bottom:10px;
 
 <button class="number" onclick="append('1')">1</button> <button class="number" onclick="append('2')">2</button> <button class="number" onclick="append('3')">3</button> <button class="operator" onclick="append('-')">−</button> <button class="function" onclick="append('log2(')">log₂</button> <button class="function" onclick="append('exp(')">exp</button>
 
-<button class="number" onclick="append('0')">0</button> <button class="number" onclick="append('.')">.</button> <button class="operator" onclick="append('+')">+</button> <button class="function" onclick="append('sinh(')">sinh</button> <button class="function" onclick="append('cosh(')">cosh</button> <button class="function" onclick="append('tanh(')">tanh</button>
+<button class="number" onclick="append('0')">0</button> <button class="number" onclick="append('.')">.</button> <button class="operator" onclick="append('+')">+</button> <button class="special" onclick="toggleAngle()">DEG</button> <button class="function" onclick="append('floor(')">floor</button> <button class="function" onclick="append('ceil(')">ceil</button>
 
 </div>
 
 </div>
 
 <div class="history">
-
 <h3>History</h3>
-
 <div id="historyList"></div>
-
 <button onclick="clearHistory()">Clear History</button>
-
 </div>
 
 </div>
@@ -152,19 +142,20 @@ margin-bottom:10px;
 let display=document.getElementById("display")
 let history=document.getElementById("historyList")
 
-let Ans=0
+let angleMode="DEG"
 let memory=0
 
-function append(v){
-display.value+=v
-}
+function append(v){ display.value+=v }
 
-function clearDisplay(){
-display.value=""
-}
+function clearDisplay(){ display.value="" }
 
-function deleteLast(){
-display.value=display.value.slice(0,-1)
+function deleteLast(){ display.value=display.value.slice(0,-1) }
+
+function toggleTheme(){ document.body.classList.toggle("dark") }
+
+function toggleAngle(){
+angleMode = angleMode==="DEG" ? "RAD":"DEG"
+event.target.innerText = angleMode
 }
 
 function calculate(){
@@ -172,17 +163,27 @@ function calculate(){
 try{
 
 let exp=display.value
-.replaceAll("^","**")
-.replaceAll("π","Math.PI")
-.replaceAll("e","Math.E")
+
+// parser
+exp = exp.replace(/√/g,"Math.sqrt")
+exp = exp.replace(/π/g,"Math.PI")
+exp = exp.replace(/e/g,"Math.E")
+exp = exp.replace(/\^/g,"**")
+
+// trig handling
+exp = exp.replace(/sin(\d+)/g,(m,n)=> trig(Math.sin,n))
+exp = exp.replace(/cos(\d+)/g,(m,n)=> trig(Math.cos,n))
+exp = exp.replace(/tan(\d+)/g,(m,n)=> trig(Math.tan,n))
+
+exp = exp.replace("log(","Math.log10(")
+exp = exp.replace("ln(","Math.log(")
 
 let result=eval(exp)
 
-Ans=result
 display.value=result
 
 let item=document.createElement("div")
-item.innerText=exp+" = "+result
+item.innerText=result
 history.prepend(item)
 
 }
@@ -193,36 +194,23 @@ display.value="Error"
 
 }
 
-function clearHistory(){
-history.innerHTML=""
+function trig(func,val){
+
+val=parseFloat(val)
+
+if(angleMode==="DEG"){
+val=val*Math.PI/180
 }
 
-/* Memory */
+return func(val)
 
-function memoryAdd(){memory+=Number(display.value||0)}
-function memorySub(){memory-=Number(display.value||0)}
-function memoryRecall(){display.value+=memory}
-function memoryClear(){memory=0}
-
-/* Theme */
-
-function toggleTheme(){
-document.body.classList.toggle("dark")
 }
 
-/* Copy */
-
-function copyResult(){
-navigator.clipboard.writeText(display.value)
-alert("Copied")
-}
-
-/* Engineering notation */
+/* engineering notation */
 
 function toEngineering(){
 
 let num=parseFloat(display.value)
-
 if(!num) return
 
 let exp=Math.floor(Math.log10(Math.abs(num))/3)*3
@@ -232,39 +220,41 @@ display.value=eng.toFixed(6)+"e"+exp
 
 }
 
-/* Engineering functions */
+/* memory */
+
+function memoryAdd(){memory+=Number(display.value||0)}
+function memorySub(){memory-=Number(display.value||0)}
+function memoryRecall(){display.value+=memory}
+function memoryClear(){memory=0}
+
+/* copy */
+
+function copyResult(){ navigator.clipboard.writeText(display.value) }
+
+/* engineering functions */
 
 function abs(x){return Math.abs(x)}
 
 function factorial(n){
-if(n==0||n==1) return 1
-let f=1
-for(let i=2;i<=n;i++) f*=i
-return f
+if(n<=1) return 1
+return n*factorial(n-1)
 }
 
 function log2(x){return Math.log2(x)}
 function exp(x){return Math.exp(x)}
-function sinh(x){return Math.sinh(x)}
-function cosh(x){return Math.cosh(x)}
-function tanh(x){return Math.tanh(x)}
 
-/* Keyboard */
+function rand(){return Math.random()}
 
 document.addEventListener("keydown",function(e){
 
 let k=e.key
 
 if(!isNaN(k)) append(k)
-
 if(["+","-","*","/","."].includes(k)) append(k)
 
 if(k==="Enter") calculate()
-
 if(k==="Backspace") deleteLast()
-
 if(k==="Escape") clearDisplay()
-
 if(k==="("||k===")") append(k)
 
 })
