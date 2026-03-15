@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Engineering Scientific Calculator</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Segoe UI, Arial;
+}
+
+body{
+margin:0;
+background:#e9eef3;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+transition:0.3s;
+}
+
+.dark{
+background:#1e1e1e;
+color:white;
+}
+
+.container{
+display:flex;
+gap:30px;
+}
+
+.calculator{
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+width:430px;
+transition:0.3s;
+}
+
+.dark .calculator{
+background:#2b2b2b;
+}
+
+#display{
+width:100%;
+height:60px;
+font-size:26px;
+text-align:right;
+padding:10px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+.buttons{
+display:grid;
+grid-template-columns:repeat(6,1fr);
+gap:10px;
+}
+
+button{
+height:55px;
+border:none;
+border-radius:8px;
+font-size:15px;
+cursor:pointer;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+.number{background:#c7d7ea;}
+.operator{background:#f3c88d;}
+.function{background:#b9d6b9;}
+.memory{background:#c7c1e4;}
+.equal{background:#4CAF50;color:white;}
+.clear{background:#e74c3c;color:white;}
+.special{background:#9bd3d0;}
+
+.history{
+width:230px;
+background:white;
+padding:15px;
+border-radius:12px;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+}
+
+.dark .history{
+background:#2b2b2b;
+}
+
+#historyList{
+height:360px;
+overflow-y:auto;
+font-size:14px;
+margin-bottom:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="calculator">
+
+<input id="display" disabled>
+
+<div class="buttons">
+
+<button class="function" onclick="append('sin(')">sin</button> <button class="function" onclick="append('cos(')">cos</button> <button class="function" onclick="append('tan(')">tan</button> <button class="function" onclick="append('log(')">log</button> <button class="function" onclick="append('ln(')">ln</button> <button class="special" onclick="toggleTheme()">Theme</button>
+
+<button class="function" onclick="append('sqrt(')">√</button> <button class="function" onclick="append('^2')">x²</button> <button class="function" onclick="append('^3')">x³</button> <button class="function" onclick="append('^')">xʸ</button> <button class="function" onclick="append('10^')">10ˣ</button> <button class="function" onclick="append('π')">π</button>
+
+<button class="function" onclick="append('e')">e</button> <button class="function" onclick="append('rand()')">rand</button> <button class="memory" onclick="memoryAdd()">M+</button> <button class="memory" onclick="memorySub()">M-</button> <button class="memory" onclick="memoryRecall()">MR</button> <button class="memory" onclick="memoryClear()">MC</button>
+
+<button class="clear" onclick="clearDisplay()">C</button> <button onclick="deleteLast()">⌫</button> <button onclick="append('(')">(</button> <button onclick="append(')')">)</button> <button onclick="append('%')">%</button> <button class="special" onclick="copyResult()">Copy</button>
+
+<button class="number" onclick="append('7')">7</button> <button class="number" onclick="append('8')">8</button> <button class="number" onclick="append('9')">9</button> <button class="operator" onclick="append('/')">÷</button> <button class="equal" onclick="calculate()">=</button> <button class="special" onclick="toEngineering()">ENG</button>
+
+<button class="number" onclick="append('4')">4</button> <button class="number" onclick="append('5')">5</button> <button class="number" onclick="append('6')">6</button> <button class="operator" onclick="append('*')">×</button> <button class="function" onclick="append('abs(')">abs</button> <button class="function" onclick="append('factorial(')">n!</button>
+
+<button class="number" onclick="append('1')">1</button> <button class="number" onclick="append('2')">2</button> <button class="number" onclick="append('3')">3</button> <button class="operator" onclick="append('-')">−</button> <button class="function" onclick="append('log2(')">log₂</button> <button class="function" onclick="append('exp(')">exp</button>
+
+<button class="number" onclick="append('0')">0</button> <button class="number" onclick="append('.')">.</button> <button class="operator" onclick="append('+')">+</button> <button class="function" onclick="append('sinh(')">sinh</button> <button class="function" onclick="append('cosh(')">cosh</button> <button class="function" onclick="append('tanh(')">tanh</button>
+
+</div>
+
+</div>
+
+<div class="history">
+
+<h3>History</h3>
+
+<div id="historyList"></div>
+
+<button onclick="clearHistory()">Clear History</button>
+
+</div>
+
+</div>
+
+<script>
+
+let display=document.getElementById("display")
+let history=document.getElementById("historyList")
+
+let Ans=0
+let memory=0
+
+function append(v){
+display.value+=v
+}
+
+function clearDisplay(){
+display.value=""
+}
+
+function deleteLast(){
+display.value=display.value.slice(0,-1)
+}
+
+function calculate(){
+
+try{
+
+let exp=display.value
+.replaceAll("^","**")
+.replaceAll("π","Math.PI")
+.replaceAll("e","Math.E")
+
+let result=eval(exp)
+
+Ans=result
+display.value=result
+
+let item=document.createElement("div")
+item.innerText=exp+" = "+result
+history.prepend(item)
+
+}
+
+catch{
+display.value="Error"
+}
+
+}
+
+function clearHistory(){
+history.innerHTML=""
+}
+
+/* Memory */
+
+function memoryAdd(){memory+=Number(display.value||0)}
+function memorySub(){memory-=Number(display.value||0)}
+function memoryRecall(){display.value+=memory}
+function memoryClear(){memory=0}
+
+/* Theme */
+
+function toggleTheme(){
+document.body.classList.toggle("dark")
+}
+
+/* Copy */
+
+function copyResult(){
+navigator.clipboard.writeText(display.value)
+alert("Copied")
+}
+
+/* Engineering notation */
+
+function toEngineering(){
+
+let num=parseFloat(display.value)
+
+if(!num) return
+
+let exp=Math.floor(Math.log10(Math.abs(num))/3)*3
+let eng=num/Math.pow(10,exp)
+
+display.value=eng.toFixed(6)+"e"+exp
+
+}
+
+/* Engineering functions */
+
+function abs(x){return Math.abs(x)}
+
+function factorial(n){
+if(n==0||n==1) return 1
+let f=1
+for(let i=2;i<=n;i++) f*=i
+return f
+}
+
+function log2(x){return Math.log2(x)}
+function exp(x){return Math.exp(x)}
+function sinh(x){return Math.sinh(x)}
+function cosh(x){return Math.cosh(x)}
+function tanh(x){return Math.tanh(x)}
+
+/* Keyboard */
+
+document.addEventListener("keydown",function(e){
+
+let k=e.key
+
+if(!isNaN(k)) append(k)
+
+if(["+","-","*","/","."].includes(k)) append(k)
+
+if(k==="Enter") calculate()
+
+if(k==="Backspace") deleteLast()
+
+if(k==="Escape") clearDisplay()
+
+if(k==="("||k===")") append(k)
+
+})
+
+</script>
+
+</body>
+</html>
