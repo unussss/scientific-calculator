@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Percentage Calculator</title>
+<style>
+body{font-family:Segoe UI;text-align:center;background:#eef2f7;padding:30px;}
+.box{background:white;padding:20px;border-radius:10px;width:320px;margin:auto;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+input{width:90%;padding:10px;margin:8px;border-radius:6px;border:1px solid #ccc;}
+button{padding:10px 15px;border:none;background:#4CAF50;color:white;border-radius:6px;cursor:pointer;}
+h2{margin-bottom:10px;}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>Percentage Calculator</h2>
+
+<input id="num" placeholder="Enter number">
+<input id="percent" placeholder="Enter %">
+
+<button onclick="calculate()">Calculate</button>
+
+<h3 id="result"></h3>
+</div>
+
+<script>
+function calculate(){
+let num = parseFloat(document.getElementById("num").value)
+let percent = parseFloat(document.getElementById("percent").value)
+
+if(isNaN(num) || isNaN(percent)){
+document.getElementById("result").innerText="Enter valid values"
+return
+}
+
+let res = (num * percent) / 100
+document.getElementById("result").innerText = percent + "% of " + num + " = " + res
+}
+</script>
+
+</body>
+</html>
